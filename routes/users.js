@@ -5,9 +5,14 @@ const userController = require('../controllers/users_controller');
 const postsController = require('../controllers/posts_controller');
 
 router.get('/',function(req,res){
-    res.end('<h1>Users</h1>');
+    return res.render('users',{
+        title: 'Users'
+    });
 })
 router.get('/profile',userController.profile);
 router.get('/posts',postsController.posts);
+router.get('/sign-up',userController.signUp);
+router.get('/sign-in',userController.signIn);
+
 
 module.exports = router;
