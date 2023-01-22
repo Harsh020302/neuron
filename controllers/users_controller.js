@@ -1,10 +1,33 @@
 
 const User = require('../models/user');
 
-module.exports.profile = function(req,res){
-    return res.render('user_profile',{
-        title: 'Users', 
-    });
+module.exports.profile = async function(req,res){
+    try{
+        let user = await User.findById(req.params.id);
+        return res.render('user_profile',{
+            title: 'User Profile', 
+            profile_user : user
+        });
+    }catch(error){
+        console.log('error',error);
+    }
+    
+}
+
+module.exports.update = async function(req,res){
+    try{
+        if(req.user.id == req.params.id){
+            await User.findByIdAndUpdate(req.params.id,req.body);
+            return res.redirect('back');
+        }
+        else{
+            return res.status(401).send('Unauthorized');
+        }
+    }
+    catch(error){
+        console.log('error',error);
+    }
+    
 }
 
 module.exports.signUp = function(req,res){
@@ -29,41 +52,15 @@ module.exports.signIn = function(req,res){
     });
 }
 
-module.exports.destroySession = function(req,res){
+module.exports.destroySession =  function(req,res){
     req.logout(function(err) {
         if (err) { console.log('Error in logging out') }
     });
-
+    req.flash('success','Logged Out Successfully');
     return res.redirect('/');
 }
 
-module.exports.create = function(req,res){
-    if(req.body.password !== req.body.confirm_password){
-        return res.redirect('back');
-    }
-
-    User.findOne({email: req.body.email},function(err,user){
-        if(err){
-            console.log('Error while checking user with email id already registered or not');
-            return;
-        }
-        if(!user){
-            User.create(req.body,function(err,user){
-                if(err){
-                    console.log('Error in creating new user');
-                    return;
-                }
-                return res.redirect('sign-in');
-            })
-        }
-        else{
-            return res.redirect('back');
-        }
-    })
-
-
-}
-
 module.exports.createSession = function(req,res){
+    req.flash('success','Logged in Successfully');
     return res.redirect('/');
 }
